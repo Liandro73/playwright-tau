@@ -1,19 +1,22 @@
 import { test, expect, Page } from '@playwright/test';
+import { HomePage } from '../pages/home-page';
 
 const URL = 'https://playwright.dev/';
+let homePage: HomePage;
 
 test.beforeEach(async ({page}) => {
   await page.goto(URL);
+  homePage = new HomePage(page);
 });
 
 async function clickGetStarted(page:Page) {
-  await page.getByRole('link', { name: 'Get started' }).click();
+  await homePage.clickButtonGetStarted();
 }
 
 test.describe('Playwright website', () => {
 
-  test('has title', async ({ page }) => {
-    await expect(page).toHaveTitle(/Playwright/);
+  test('has title', async () => {
+    await homePage.asserHomePageTittle();
   });
 
   test('get started link', async ({ page }) => {
