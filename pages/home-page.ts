@@ -1,6 +1,6 @@
 import { expect, type Locator, type Page } from "@playwright/test";
 
-export class HomePage{
+export class HomePage {
 
     readonly page: Page;
     readonly btnGetStarted: Locator;
@@ -16,7 +16,7 @@ export class HomePage{
         await this.btnGetStarted.click();
     }
 
-    async asserHomePageTittle() {
+    async asserHomePageTitle() {
         await expect(this.page).toHaveTitle(this.title);
     }
 

@@ -1,41 +1,45 @@
-import { test, expect, Page } from '@playwright/test';
+import { test, Page } from '@playwright/test';
 import { HomePage } from '../pages/home-page';
+import { TopMenuPage } from '../pages/top-menu-page';
 
 const URL = 'https://playwright.dev/';
 let homePage: HomePage;
+let topMenuPage: TopMenuPage;
+const pageUrl = /.*intro/;
 
 test.beforeEach(async ({page}) => {
-  await page.goto(URL);
-  homePage = new HomePage(page);
+    await page.goto(URL);
+    homePage = new HomePage(page);
+    topMenuPage = new TopMenuPage(page);
 });
 
-async function clickGetStarted(page:Page) {
-  await homePage.clickButtonGetStarted();
+async function clickGetStarted(page: Page) {
+    await homePage.clickButtonGetStarted();
 }
 
-test.describe('Playwright website', () => {
+test.describe.only('Playwright website', () => {
 
-  test('has title', async () => {
-    await homePage.asserHomePageTittle();
-  });
+    test('has title', async () => {
+        await homePage.asserHomePageTitle();
+    });
+    
+    test('get started link', async ({ page }) => {
+        await clickGetStarted(page);
+        await topMenuPage.assertPageUrl(pageUrl);
+    });
+    
+    test('check Java page', async ({ page }) => {
+        await test.step('Act', async () => {
+            await clickGetStarted(page);
+            await topMenuPage.hoverNode();
+            await topMenuPage.clickJava();
+        });
+      
+        await test.step('Assert', async () => {
+            await topMenuPage.assertPageUrl(pageUrl);
+            await topMenuPage.assertNodeDescriptionNotVisible();
+            await topMenuPage.assertJavaDescriptionVisible();
+        });
+    });
 
-  test('get started link', async ({ page }) => {
-    clickGetStarted(page);
-    await expect(page.getByRole('heading', { name: 'Installation' })).toBeVisible();
-  });
-
-  test.only('check Java page', async ({ page }) => {
-    clickGetStarted(page);
-
-    await page.getByRole('button', {name: 'Node.js'}).hover();
-    await page.getByLabel('Main', { exact: true }).getByText('Java').click();
-
-    await expect(page).toHaveURL('https://playwright.dev/java/docs/intro');
-    await expect(page.getByText('INstalling Playwright', { exact: true })).not.toBeVisible();
-
-    const javaDescription = `Playwright is distributed as a set of Maven modules. The easiest way to use it is to add one dependency to your project's pom.xml as described below. If you're not familiar with Maven please refer to its documentation.`;
-    await expect(page.getByText(javaDescription)).toBeVisible();
-
-  });
-  
 });
